@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chapter – EduPlan AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    .prose :where(h1,h2,h3) { color: theme('colors.gray.900'); }
+    .dark .prose :where(h1,h2,h3) { color: theme('colors.gray.100'); }
+    .prose pre { background: #111827; color: white; }
+    .dark .prose pre { background: #1f2937; }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 h-screen flex flex-col text-gray-900 dark:text-gray-100">
+
+  <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-8 py-4 flex items-center justify-between shrink-0">
+    <a href="course-dashboard.html" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">
+      ← Dashboard
+    </a>
+    <h2 id="chapterTitle" class="font-bold text-lg sm:text-xl truncate max-w-[60vw]">Chapter Title</h2>
+    <div class="w-10"></div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar (desktop) -->
+    <aside class="hidden lg:block w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto p-6">
+      <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Course Modules</h3>
+      <ul class="space-y-1.5">
+        <li class="px-4 py-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium cursor-pointer">1. Introduction to AsyncIO</li>
+        <li class="px-4 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer">2. Coroutines</li>
+        <!-- more... -->
+      </ul>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
+
+      <div class="max-w-4xl mx-auto p-6 lg:p-10 pb-24">
+
+        <div class="inline-flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-8">
+          <button id="tabLecture" onclick="switchTab('lecture')" class="px-6 py-2.5 rounded-lg text-sm font-semibold bg-white dark:bg-gray-900 shadow-sm text-indigo-600 dark:text-indigo-400">
+            📖 Lecture
+          </button>
+          <button id="tabQuiz" onclick="switchTab('quiz')" class="px-6 py-2.5 rounded-lg text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
+            📝 Quiz
+          </button>
+        </div>
+
+        <div id="lectureView">
+          <article id="lectureContent" class="prose prose-indigo dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-indigo-600 dark:prose-a:text-indigo-400">
+            <!-- Filled by JS -->
+          </article>
+
+          <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <button onclick="switchTab('quiz')" class="w-full sm:w-auto bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-indigo-700 shadow-lg transition-all">
+              I've finished reading → Take Quiz
+            </button>
+          </div>
+        </div>
+
+        <div id="quizView" class="hidden">
+          <h2 class="text-2xl sm:text-3xl font-bold mb-8">Quick Knowledge Check</h2>
+
+          <form id="quizForm" class="space-y-8">
+            <!-- Filled by JS -->
+          </form>
+
+          <div id="quizResult" class="hidden mt-10 p-8 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl text-emerald-800 dark:text-emerald-200">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-3xl">🎉</span>
+              <h4 class="text-xl font-bold">Great job! You passed.</h4>
+            </div>
+            <p class="mb-6">Next module is now unlocked.</p>
+            <button onclick="window.location.href='course-dashboard.html'" class="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-colors">
+              Continue to Next Module →
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const chapterId = localStorage.getItem('currentChapterId');
+
+    // Mock — replace with real API call
+    const chapterData = {
+      title: "Introduction to AsyncIO",
+      content: `
+# What is AsyncIO?
+
+**asyncio** is a library to write **concurrent** code using the **async / await** syntax.
+
+## Key Benefits
+
+- Excellent for I/O-bound and high-level structured network code
+- Lightweight alternative to threading / multiprocessing
+- Single-threaded concurrency model
+
+## Basic Example
+
+\`\`\`python
+import asyncio
+import time
+
+async def say_after(delay, what):
+    await asyncio.sleep(delay)
+    print(what)
+
+async def main():
+    print(f"started at {time.strftime('%X')}")
+    await say_after(1, 'hello')
+    await say_after(2, 'world')
+    print(f"finished at {time.strftime('%X')}")
+
+asyncio.run(main())
+\`\`\`
+      `,
+      quiz: [
+        { q: "What syntax does AsyncIO use for concurrency?", opts: ["async/await", "Promise/then", "callbacks"], ans: 0 },
+        { q: "AsyncIO is most suitable for:", opts: ["CPU-bound tasks", "I/O-bound tasks", "GPU computations"], ans: 1 }
+      ]
+    };
+
+    function loadChapter() {
+      document.getElementById('chapterTitle').textContent = chapterData.title;
+      document.getElementById('lectureContent').innerHTML = marked.parse(chapterData.content);
+
+      const form = document.getElementById('quizForm');
+      form.innerHTML = '';
+
+      chapterData.quiz.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = "bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700";
+        div.innerHTML = `
+          <p class="font-bold text-lg mb-5">${i+1}. ${item.q}</p>
+          <div class="space-y-3">
+            ${item.opts.map((opt, j) => `
+              <label class="flex items-center p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:border-indigo-400 transition-colors has-[:checked]:border-indigo-500">
+                <input type="radio" name="q${i}" value="${j}" class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                <span class="ml-4 text-gray-800 dark:text-gray-200">${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        `;
+        form.appendChild(div);
+      });
+
+      const submit = document.createElement('button');
+      submit.type = 'submit';
+      submit.className = "w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition-colors mt-6";
+      submit.textContent = "Check Answers";
+      form.appendChild(submit);
+    }
+
+    function switchTab(tab) {
+      document.getElementById('lectureView').classList.toggle('hidden', tab !== 'lecture');
+      document.getElementById('quizView').classList.toggle('hidden', tab !== 'quiz');
+
+      document.getElementById('tabLecture').classList.toggle('bg-white', tab === 'lecture');
+      document.getElementById('tabLecture').classList.toggle('dark:bg-gray-900', tab === 'lecture');
+      document.getElementById('tabLecture').classList.toggle('shadow-sm', tab === 'lecture');
+      document.getElementById('tabLecture').classList.toggle('text-indigo-600', tab === 'lecture');
+      document.getElementById('tabLecture').classList.toggle('dark:text-indigo-400', tab === 'lecture');
+
+      document.getElementById('tabQuiz').classList.toggle('bg-white', tab === 'quiz');
+      document.getElementById('tabQuiz').classList.toggle('dark:bg-gray-900', tab === 'quiz');
+      document.getElementById('tabQuiz').classList.toggle('shadow-sm', tab === 'quiz');
+      document.getElementById('tabQuiz').classList.toggle('text-indigo-600', tab === 'quiz');
+      document.getElementById('tabQuiz').classList.toggle('dark:text-indigo-400', tab === 'quiz');
+    }
+
+    document.getElementById('quizForm').addEventListener('submit', e => {
+      e.preventDefault();
+      document.getElementById('quizResult').classList.remove('hidden');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+
+    loadChapter();
+  </script>
+</body>
+</html>

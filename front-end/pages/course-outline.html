@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Review Course Outline – EduPlan AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { primary: '#4f46e5' } } }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100 antialiased">
+
+  <div class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div class="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+
+      <div class="bg-indigo-600 px-6 py-8 sm:px-10 text-white">
+        <h1 class="text-2xl sm:text-3xl font-bold">Review Your Learning Path</h1>
+        <p class="mt-2 text-indigo-100">AI has created this outline based on your request. Review before generating full content.</p>
+      </div>
+
+      <div class="p-6 sm:p-10">
+        <div class="mb-8">
+          <label class="block text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Course Title</label>
+          <h2 id="courseTitle" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Loading...</h2>
+        </div>
+
+        <div class="mb-10">
+          <label class="block text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">Chapters</label>
+          <ul id="chaptersList" class="space-y-3 min-h-[150px]">
+      
+          </ul>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <button onclick="window.location.href='my-courses.html'" class="flex-1 px-6 py-3.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            ← Back
+          </button>
+          <button id="confirmBtn" onclick="confirmPlan()" class="flex-1 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200/50 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+            Looks Good – Generate Content 🚀
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  
+    let pending = null;
+    const pendingRaw = localStorage.getItem('pendingCourse');
+
+    console.log('[DEBUG] Raw pendingCourse from localStorage:', pendingRaw);
+
+    if (pendingRaw) {
+      try {
+        pending = JSON.parse(pendingRaw);
+        console.log('[DEBUG] Parsed pendingCourse:', pending);
+      } catch (e) {
+        console.error('[ERROR] Failed to parse pendingCourse:', e);
+      }
+    }
+
+    if (!pending || !pending.courseId || !pending.title || !Array.isArray(pending.outline) || pending.outline.length === 0) {
+      pending = {
+        courseId: 'mock_id_123',
+        title: 'Mock Course Title for Testing',
+        outline: [
+          'Chapter 1: Introduction',
+          'Chapter 2: Advanced Topics',
+          'Chapter 3: Practical Exercises',
+          'Chapter 4: Conclusion and Projects'
+        ]
+      };
+      console.warn('[DEBUG] Using mock data for pendingCourse since no valid data found in localStorage.');
+     
+    }
+
+    document.getElementById('courseTitle').textContent = pending.title;
+
+    const list = document.getElementById('chaptersList');
+    list.innerHTML = ''; 
+
+    pending.outline.forEach((chapter, index) => {
+      const li = document.createElement('li');
+      li.className = "flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors duration-200";
+      li.innerHTML = `
+        <div class="w-10 h-10 flex items-center justify-center bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-full font-bold text-base shrink-0">
+          ${index + 1}
+        </div>
+        <span class="font-medium text-gray-900 dark:text-gray-100 text-lg">${chapter}</span>
+      `;
+      list.appendChild(li);
+    });
+
+    async function confirmPlan() {
+      const btn = document.getElementById('confirmBtn');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="animate-spin inline-block w-5 h-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Generating...';
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/courses/${pending.courseId}/confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ confirmedPlan: pending.outline })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || `Server responded with ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success || data.courseId || data.id) {
+          localStorage.setItem('currentCourseId', pending.courseId);
+          localStorage.removeItem('pendingCourse');
+          window.location.href = 'course-dashboard.html';
+        } else {
+          throw new Error(data.error || 'Confirmation failed');
+        }
+      } catch (err) {
+        console.error('[confirmPlan] Error:', err);
+        alert(`Failed to generate course content.\n\n${err.message || 'Connection or server error'}`);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

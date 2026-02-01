@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduPlan AI — User List (Admin View)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen antialiased">
+
+  <div class="flex h-screen">
+    <aside class="hidden md:flex md:flex-col w-72 bg-white border-r border-gray-200">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">E</div>
+          <span class="text-xl font-bold text-gray-900">EduPlan AI</span>
+        </div>
+        <p class="mt-1 text-xs text-gray-500">Admin Panel</p>
+      </div>
+
+      <nav class="flex-1 px-3 py-6 space-y-1">
+        <a href="#" class="flex items-center px-4 py-3 bg-indigo-50 text-indigo-700 font-medium rounded-lg">
+          <span class="text-xl mr-3">👥</span> All Users
+        </a>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+          <span class="text-xl mr-3">📊</span> Statistics
+        </a>
+      </nav>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-semibold text-gray-900">Registered Users</h1>
+          <p class="text-sm text-gray-500 mt-0.5">Admin view — Database records</p>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto p-6 lg:p-10">
+        <div class="max-w-5xl mx-auto">
+          
+          <div id="users-container" class="grid grid-cols-1 gap-6">
+            <p class="text-center text-gray-500">Loading users...</p>
+          </div>
+
+          <div class="mt-8 text-center text-sm text-gray-500">
+            Read-only database view • Last sync: <span id="sync-time"></span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    async function fetchUsers() {
+      const container = document.getElementById('users-container');
+      const syncTime = document.getElementById('sync-time');
+      
+      try {
+        const response = await fetch('http://localhost:3000/auth/users');
+        const users = await response.json();
+        
+        syncTime.innerText = new Date().toLocaleTimeString();
+        container.innerHTML = '';
+
+        if (users.length === 0) {
+          container.innerHTML = '<p class="text-center text-gray-500">No users found in database.</p>';
+          return;
+        }
+
+        users.forEach(user => {
+          const userCard = `
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <div class="flex flex-col md:flex-row">
+                <div class="bg-indigo-900 md:w-48 p-6 flex flex-col items-center justify-center text-white">
+                   <div class="w-20 h-20 rounded-full bg-white/20 border-2 border-white/30 mb-3 flex items-center justify-center text-2xl font-bold">
+                    ${user.name[0]}${user.surname[0]}
+                   </div>
+                   <p class="font-bold text-center">${user.name} ${user.surname}</p>
+                   <span class="text-xs text-indigo-200 uppercase tracking-widest mt-1">Age: ${user.age}</span>
+                </div>
+                
+                <div class="flex-1 p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-xs text-gray-400 uppercase font-semibold">Email Address</p>
+                    <p class="text-gray-900 font-medium">${user.email}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-400 uppercase font-semibold">Database ID</p>
+                    <p class="text-gray-500 font-mono text-xs">${user._id}</p>
+                  </div>
+                  <div class="md:col-span-2">
+                    <p class="text-xs text-gray-400 uppercase font-semibold">Password</p>
+                    <p class="text-gray-500 font-mono text-xs bg-gray-50 p-2 rounded mt-1 break-all">${user.password}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          container.innerHTML += userCard;
+        });
+
+      } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="text-center text-red-500">Failed to load users from server.</p>';
+      }
+    }
+
+    fetchUsers();
+  </script>
+</body>
+</html>
