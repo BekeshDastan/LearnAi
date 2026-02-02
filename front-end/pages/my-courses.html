@@ -190,13 +190,30 @@
     </div>
 
     <script>
+        const API_BASE = ('http://localhost:3000');
         const userId = localStorage.getItem('userId');
         const modal = document.getElementById('createModal');
         const coursesList = document.getElementById('coursesList');
         const emptyState = document.getElementById('emptyState');
         const loadingSkeleton = document.getElementById('loadingSkeleton');
 
-        if (!userId) {
+        const errorBanner = document.createElement('div');
+        errorBanner.id = 'backendErrorBanner';
+        errorBanner.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-50 hidden bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-3';
+        errorBanner.innerHTML = `<span id="backendErrorText">Backend unreachable</span><button id="retryBtn" class="bg-white/20 hover:bg-white/30 text-sm px-3 py-1 rounded">Retry</button>`;
+        document.body.appendChild(errorBanner);
+        document.getElementById('retryBtn').addEventListener('click', () => { loadCourses(); });
+
+        function showBackendError(msg) {
+            const el = document.getElementById('backendErrorBanner');
+            document.getElementById('backendErrorText').textContent = msg || 'Backend unreachable';
+            el.classList.remove('hidden');
+        }
+        function hideBackendError() { document.getElementById('backendErrorBanner').classList.add('hidden'); }
+
+        if (!userId || userId === 'undefined') {
+            
+            alert('You are not signed in — please sign in first.');
             window.location.href = 'LoggingIn.html';
         }
 
@@ -233,9 +250,11 @@
             emptyState.classList.add('hidden');
 
             try {
-                const response = await fetch(`http://localhost:3000/api/courses?userId=${userId}`);
+                const response = await fetch(`${API_BASE}/api/courses?userId=${userId}`);
+                if (!response.ok) throw new Error(`Server returned ${response.status}`);
                 const result = await response.json();
 
+                hideBackendError();
                 loadingSkeleton.classList.add('hidden');
 
                 const courses = result.data || result || [];
@@ -315,30 +334,34 @@
             btn.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:3000/api/courses/init', {
+                const response = await fetch(`${API_BASE}/api/courses/init`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         userId: userId,
                         title: titleInput.value.trim(),
                         topicRequest: topicsInput.value.trim()
-                    })
+                    }),
+                    signal: (new AbortController()).signal
                 });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    showBackendError(data.error || `Create failed (${response.status})`);
+                    throw new Error(data.error || 'Create failed');
+                }
 
                 const data = await response.json();
 
-                if (response.ok) {
-                    localStorage.setItem('pendingCourse', JSON.stringify({
-                        courseId: data._id || data.courseId,
-                        title: titleInput.value.trim(),
-                        outline: data.initialPlan || data.plan
-                    }));
+                hideBackendError();
+                localStorage.setItem('pendingCourse', JSON.stringify({
+                    courseId: data._id || data.courseId,
+                    title: titleInput.value.trim(),
+                    outline: data.initialPlan || data.plan
+                }));
 
-                    closeModal();
-                    window.location.href = 'course-outline.html';
-                } else {
-                    alert(data.error || 'Failed to create course');
-                }
+                closeModal();
+                window.location.href = 'course-outline.html';
             } catch (err) {
                 console.error(err);
                 alert('Server connection error');

@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Course Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-50 min-h-screen">
-    
+
     <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
         <a href="my-courses.html" class="flex items-center gap-2 text-gray-600 hover:text-indigo-600 font-medium">
             <span>&larr;</span> Back to My Courses
         </a>
         <div class="font-bold text-lg text-indigo-900" id="dashTitle">Course Name</div>
-        <div class="w-8"></div> </header>
+        <div class="w-8"></div>
+    </header>
 
     <main class="max-w-4xl mx-auto p-6 md:p-10">
-        
+
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 mb-8">
             <div class="flex justify-between items-end mb-4">
                 <div>
@@ -25,7 +28,8 @@
                 <div class="text-2xl font-bold text-indigo-600" id="progressPercent">0%</div>
             </div>
             <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                <div id="progressBar" class="bg-indigo-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                <div id="progressBar" class="bg-indigo-600 h-3 rounded-full transition-all duration-500"
+                    style="width: 0%"></div>
             </div>
         </div>
 
@@ -37,82 +41,122 @@
     </main>
 
     <script>
+        const API_BASE = 'http://localhost:3000';
         const courseId = localStorage.getItem('currentCourseId');
+        let isGenerating = false; 
 
         async function loadDashboard() {
-            const courseData = {
-                title: "Advanced Python Programming",
-                chapters: [
-                    { id: "1", title: "Introduction to AsyncIO", status: "completed" },
-                    { id: "2", title: "Understanding Coroutines", status: "unlocked" }, // Текущая активная
-                    { id: "3", title: "Event Loops Deep Dive", status: "locked" },
-                    { id: "4", title: "Building an Async Server", status: "locked" }
-                ]
-            };
+            if (!courseId) {
+                alert("Course ID not found!");
+                window.location.href = 'my-courses.html';
+                return;
+            }
 
-            document.getElementById('dashTitle').textContent = courseData.title;
+            try {
+                const response = await fetch(`${API_BASE}/api/courses/${courseId}`);
+                if (!response.ok) throw new Error("Failed to fetch course");
+                const course = await response.json();
 
-            const total = courseData.chapters.length;
-            const completed = courseData.chapters.filter(c => c.status === 'completed').length;
-            const percent = Math.round((completed / total) * 100);
-            
-            document.getElementById('progressPercent').textContent = `${percent}%`;
-            document.getElementById('progressBar').style.width = `${percent}%`;
+                document.getElementById('dashTitle').textContent = course.title;
 
-            const container = document.getElementById('chaptersContainer');
-            container.innerHTML = '';
+                const chapters = course.chapters || [];
+                const container = document.getElementById('chaptersContainer');
 
-            courseData.chapters.forEach((chapter, index) => {
-                const isLocked = chapter.status === 'locked';
-                const isCompleted = chapter.status === 'completed';
-                const isActive = chapter.status === 'unlocked';
+                if (chapters.length === 0) {
+                    container.innerHTML = `
+                    <div class="text-center p-10 bg-indigo-50 rounded-xl border border-indigo-100 animate-pulse">
+                        <h3 class="text-xl font-bold text-indigo-700 mb-2">AI is writing your course...</h3>
+                        <p class="text-indigo-600">Please wait, chapters will appear here one by one.</p>
+                        <div class="mt-4 text-sm text-gray-500">Auto-refreshing in 3 seconds...</div>
+                    </div>
+                `;
 
-                let icon = `<span class="text-gray-400 font-bold">${index+1}</span>`; 
-                let btnText = "Locked";
-                let btnClass = "bg-gray-100 text-gray-400 cursor-not-allowed";
-                let cardClass = "opacity-75 bg-gray-50";
-
-                if (isCompleted) {
-                    icon = `✅`;
-                    btnText = "Review";
-                    btnClass = "bg-green-100 text-green-700 hover:bg-green-200";
-                    cardClass = "bg-white border-green-200";
-                } else if (isActive) {
-                    icon = `▶️`;
-                    btnText = "Start Learning";
-                    btnClass = "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md";
-                    cardClass = "bg-white border-indigo-200 ring-2 ring-indigo-50";
+                    setTimeout(loadDashboard, 3000);
+                    return;
                 }
 
-                const div = document.createElement('div');
-                div.className = `flex items-center justify-between p-5 rounded-xl border transition-all ${cardClass}`;
-                div.innerHTML = `
+                if (course.status === 'generating') {
+                    if (!isGenerating) {
+                        const statusDiv = document.createElement('div');
+                        statusDiv.className = "text-sm text-indigo-600 font-medium mb-4 animate-pulse";
+                        statusDiv.innerText = "⚡ Generating more chapters...";
+                        container.parentNode.insertBefore(statusDiv, container);
+                        isGenerating = true;
+                    }
+                    setTimeout(loadDashboard, 5000);
+                }
+
+                const total = chapters.length; 
+                const completed = chapters.filter(c => c.isCompleted).length;
+                const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                document.getElementById('progressPercent').textContent = `${percent}%`;
+                document.getElementById('progressBar').style.width = `${percent}%`;
+
+                container.innerHTML = '';
+
+                chapters.forEach((chapter, index) => {
+                    const isCompleted = chapter.isCompleted;
+                    const isPreviousCompleted = index === 0 || chapters[index - 1].isCompleted;
+
+                    const isActive = !isCompleted && isPreviousCompleted;
+                    const isLocked = !isCompleted && !isPreviousCompleted;
+
+                    let icon = `<span class="text-gray-400 font-bold">${index + 1}</span>`;
+                    let btnText = "Locked";
+                    let btnClass = "bg-gray-100 text-gray-400 cursor-not-allowed";
+                    let cardClass = "opacity-75 bg-gray-50";
+
+                    if (isCompleted) {
+                        icon = `✅`;
+                        btnText = "Review";
+                        btnClass = "bg-green-100 text-green-700 hover:bg-green-200";
+                        cardClass = "bg-white border-green-200";
+                    } else if (isActive) {
+                        icon = `▶️`;
+                        btnText = "Start Learning";
+                        btnClass = "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md";
+                        cardClass = "bg-white border-indigo-200 ring-2 ring-indigo-50";
+                    }
+
+                    const div = document.createElement('div');
+                    div.className = `flex items-center justify-between p-5 rounded-xl border transition-all ${cardClass}`;
+                    div.innerHTML = `
                     <div class="flex items-center gap-5">
                         <div class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-lg">
                             ${icon}
                         </div>
                         <div>
                             <h4 class="font-bold text-gray-900 text-lg">${chapter.title}</h4>
-                            <span class="text-xs uppercase font-bold tracking-wider text-gray-400">${isLocked ? 'Locked' : (isCompleted ? 'Completed' : 'Current Module')}</span>
+                            <span class="text-xs uppercase font-bold tracking-wider text-gray-400">
+                                ${isLocked ? 'Locked' : (isCompleted ? 'Completed' : 'Current Module')}
+                            </span>
                         </div>
                     </div>
                     <button 
-                        onclick="openChapter('${chapter.id}')"
+                        onclick="openChapter('${chapter._id}')"
                         ${isLocked ? 'disabled' : ''}
                         class="px-5 py-2.5 rounded-lg font-medium transition-colors ${btnClass}">
                         ${btnText}
                     </button>
                 `;
-                container.appendChild(div);
-            });
+                    container.appendChild(div);
+                });
+
+            } catch (error) {
+                console.error("Error loading dashboard:", error);
+                document.getElementById('chaptersContainer').innerHTML =
+                    `<p class="text-red-500">Error loading course data. Make sure backend is running.</p>`;
+            }
         }
 
         function openChapter(id) {
             localStorage.setItem('currentChapterId', id);
-            window.location.href = 'chapter-view.html';
+            window.location.href = 'chapter-view.html'; 
         }
 
         loadDashboard();
     </script>
 </body>
+
 </html>

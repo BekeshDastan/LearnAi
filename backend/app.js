@@ -1,9 +1,14 @@
+
+require('dotenv').config(); 
+
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const fs = require("fs");
 
 const authRoutes = require("./routes/auth.routes");
+const courseRoutes = require('./routes/course.routes');
+const aiRoutes = require('./routes/ai.routes'); 
 
 const app = express();
 
@@ -25,11 +30,15 @@ app.get("/test", (req, res) => {
 
 app.use("/auth", authRoutes);
 
+app.use('/api/courses', courseRoutes);
+
+app.use('/api/courses', aiRoutes); 
+
+app.use('/courses', courseRoutes);
+
 const pagesPath = path.join(frontEndPath, "pages");
 if (fs.existsSync(pagesPath)) {
   console.log("Pages directory found!");
-  const pagesFiles = fs.readdirSync(pagesPath);
-  console.log("Available pages:", pagesFiles);
 } else {
   console.error("ERROR: Pages directory not found!");
 }
@@ -44,13 +53,7 @@ app.use((req, res) => {
   res.status(404).send(`
     <h1>404 - Page Not Found</h1>
     <p>Requested path: ${req.path}</p>
-    <p>Available pages:</p>
-    <ul>
-      <li><a href="/">/ (index.html)</a></li>
-      <li><a href="/pages/LoggingIn.html">/pages/LoggingIn.html</a></li>
-      <li><a href="/pages/account.html">/pages/account.html</a></li>
-      <li><a href="/pages/admin.html">/pages/admin.html</a></li>
-    </ul>
+    <a href="/">Go Home</a>
   `);
 });
 
