@@ -1,5 +1,5 @@
-
 const User = require("../models/User.model");
+const bcrypt = require('bcrypt');
 
 exports.getAllUsers = async (req, res) => {
     const users = await User.find();
@@ -14,15 +14,19 @@ exports.getUserById = async (req, res) => {
 
 exports.register = async (req, res) => {
     const { name, surname, age, email, password } = req.body;
-    const newUser = await User.create({ name, surname, age, email, password });
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const newUser = await User.create({ name, surname, age, email, password: hashedPassword });
     res.status(201).json(newUser);
 };
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+
+    const isMatch = await bcrypt.compare(password, user.password);
     
-    if (!user || user.password !== password) {
+    if (!user || !isMatch) {
         return res.status(401).json({ error: "Invalid email or password" });
     }
     
@@ -34,9 +38,12 @@ exports.login = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     const { name, surname, age, email, password } = req.body;
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const changedUser = await User.findByIdAndUpdate(
         req.params.id,
-        { name, surname, age, email, password },
+        { name, surname, age, email, password: hashedPassword },
         { new: true, runValidators: true }
     );
     if (!changedUser) return res.status(404).json({ error: "User not found" });

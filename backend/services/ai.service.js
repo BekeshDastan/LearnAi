@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const JSON5 = require('json5');
 
 console.log('GEMINI KEY LOADED:', !!process.env.GEMINI_API_KEY);
 
@@ -100,7 +101,7 @@ async function generateChapterData(courseTitle, chapterTitle) {
         const text = cleanAIResponse(result.response.text());
 
         try {
-            return JSON.parse(text);
+            return JSON5.parse(text);
         } catch (parseError) {
             console.error("JSON Parse Failed. Bad text:", text);
             throw parseError; 

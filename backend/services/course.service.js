@@ -31,13 +31,14 @@ async function addChapter(courseId, { title, content = '', quiz = [] }) {
     const course = await Course.findById(courseId);
     if (!course) throw new Error('Course not found');
     if ((course.chapters || []).length >= 1000) throw new Error('chapter limit exceeded');
-
+    
     const chapter = await Chapter.create({ course: course._id, title, content, quiz });
     course.chapters.push(chapter._id);
     if (course.progress < 0 || course.progress > 100) course.progress = 0;
     await course.save();
     return chapter;
 }
+
 
 async function initCourse({ user, title, topicRequest }) {
     let outline = [];

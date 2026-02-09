@@ -17,6 +17,12 @@ router.delete('/:id', asyncHandler(controller.deleteCourse));
 
 router.get('/chapters/:chapterId', asyncHandler(controller.getChapterById));
 
+router.post('/:id/chapters', asyncHandler(controller.addChapter));
+
+router.delete('/:id/chapters/:chapterId', asyncHandler(controller.deleteChapter));
+
+router.put('/:id/chapters/:chapterId', asyncHandler(controller.updateChapter));
+
 router.post('/chapters/:chapterId/complete', asyncHandler(controller.markChapterComplete));
 
 

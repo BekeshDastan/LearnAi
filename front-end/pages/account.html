@@ -230,7 +230,6 @@
   <script>
     const userId = localStorage.getItem('userId');
 
-    // 1. Load data when the page opens
     async function loadUserProfile() {
       if (!userId || userId === "undefined") {
         alert("Please log in first");
@@ -243,7 +242,6 @@
         const user = await response.json();
 
         if (response.ok) {
-          // Update View Mode UI
           document.getElementById('headerName').textContent = `${user.surname} ${user.name}`;
           document.getElementById('headerEmail').textContent = user.email;
           document.getElementById('viewName').textContent = user.name;
@@ -260,7 +258,6 @@
             showBtn.style.display = 'none';
           };
 
-          // Pre-fill Edit Mode Form
           document.getElementById('editName').value = user.name;
           document.getElementById('editSurname').value = user.surname;
           document.getElementById('editAge').value = user.age;
@@ -271,7 +268,6 @@
       }
     }
 
-    // 2. Handle Form Submission (Save Changes)
     document.getElementById('editMode').addEventListener('submit', async (e) => {
       e.preventDefault();
 

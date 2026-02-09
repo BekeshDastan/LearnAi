@@ -63,6 +63,27 @@ async function getChapterById(req, res) {
     }
 }
 
+async function deleteChapter(req, res) {
+  try {
+    const chapter = await Chapter.findByIdAndDelete(req.params.chapterId);
+    if (!chapter) return res.status(404).json({ error: 'Chapter not found' });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+async function updateChapter(req, res) {
+  try {
+    const patch = req.body;
+    const updated = await Chapter.findByIdAndUpdate(req.params.chapterId, patch, { new: true });
+    if (!updated) return res.status(404).json({ error: 'Chapter not found' });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 async function markChapterComplete(req, res) {
     try {
         const chapter = await Chapter.findByIdAndUpdate(
@@ -84,6 +105,8 @@ module.exports = {
     updateCourse,
     deleteCourse,
     addChapter,
+    deleteChapter,
+    updateChapter,
     getChapterById,
     markChapterComplete
 };
