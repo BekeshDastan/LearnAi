@@ -1,5 +1,7 @@
+const jwt = require('jsonwebtoken');
 const User = require("../models/User.model");
 const bcrypt = require('bcrypt');
+const { secretKey } = require('../middleware/jwt.middleware');
 
 exports.getAllUsers = async (req, res) => {
     const users = await User.find();
@@ -21,19 +23,40 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    
-    if (!user || !isMatch) {
-        return res.status(401).json({ error: "Invalid email or password" });
+        if (!user) {
+            return res.status(401).json({ error: "Invalid email or password" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        
+        if (!isMatch) {
+            return res.status(401).json({ error: "Invalid email or password" });
+        }
+        
+        const token = jwt.sign(
+            { id: user._id, roles: user.roles }, 
+            secretKey, 
+            { expiresIn: '24h' }
+        );
+
+        res.json({ 
+            message: "Login successful", 
+            token: token,
+            user: { 
+                id: user._id, 
+                name: user.name, 
+                email: user.email,
+                roles: user.roles 
+            } 
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: "Server error during login" });
     }
-    
-    res.json({ 
-        message: "Login successful", 
-        user: { id: user.id, name: user.name, email: user.email } 
-    });
 };
 
 exports.updateUser = async (req, res) => {

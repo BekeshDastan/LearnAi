@@ -118,27 +118,30 @@
         const data = await response.json();
 
         if (response.ok) {
-   
           const idToSave = data.user.id || data.user._id;
 
-          if (idToSave) {
-
+          if (idToSave && data.token) {
             localStorage.setItem('userId', idToSave);
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userRole', data.user.roles);
 
-            console.log("Login successful. ID saved:", idToSave);
+            console.log("Login successful. Data saved.");
 
-            window.location.href = "my-courses.html";
+            if (data.user.roles === 'admin') {
+              window.location.href = "admin.html";
+            } else {
+              window.location.href = "my-courses.html";
+            }
           } else {
-            console.error("Server response missing user ID:", data);
-            alert("Login error: User data is incomplete.");
+            console.error("Missing data in response:", data);
+            alert("Login error: Token or User ID missing.");
           }
         } else {
-       
           alert(data.error || "Login failed");
         }
       } catch (error) {
         console.error("Network or Server Error:", error);
-        alert("Could not connect to the server. Please check if your server.js is running.");
+        alert("Could not connect to the server.");
       }
     });
   </script>
