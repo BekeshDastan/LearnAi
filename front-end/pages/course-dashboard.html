@@ -3,39 +3,56 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-transition { transition: all 0.2s ease-in-out; }
+        @media (max-width: 640px) {
+            .mobile-stack { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .mobile-full-btn { width: 100%; text-align: center; }
+        }
+    </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen text-slate-900">
 
-    <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
-        <a href="my-courses.html" class="flex items-center gap-2 text-gray-600 hover:text-indigo-600 font-medium">
-            <span>&larr;</span> Back to My Courses
+    <header class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50 px-4 sm:px-6 py-4 flex justify-between items-center">
+        <a href="my-courses.html" class="flex items-center gap-2 text-slate-600 hover:text-indigo-600 font-semibold transition-colors">
+            <span class="text-xl">&larr;</span> <span class="hidden sm:inline">My Courses</span>
         </a>
-        <div class="font-bold text-lg text-indigo-900" id="dashTitle">Course Name</div>
-        <div class="w-8"></div>
-    </header>
+        <div class="font-bold text-base sm:text-lg text-indigo-900 truncate px-4" id="dashTitle">Course Name</div>
+        <div class="w-10 sm:w-8"></div> </header>
 
-    <main class="max-w-4xl mx-auto p-6 md:p-10">
+    <main class="max-w-4xl mx-auto p-4 sm:p-6 md:p-10">
 
-        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 mb-8">
-            <div class="flex justify-between items-end mb-4">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 mb-8">
+            <div class="flex justify-between items-end mb-6">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Your Progress</h1>
-                    <p class="text-gray-500">Keep going! You are doing great.</p>
+                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-1">Your Progress</h1>
+                    <p class="text-slate-500 text-sm sm:text-base">Keep going! You're doing great.</p>
                 </div>
-                <div class="text-2xl font-bold text-indigo-600" id="progressPercent">0%</div>
+                <div class="text-2xl sm:text-3xl font-black text-indigo-600" id="progressPercent">0%</div>
             </div>
-            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                <div id="progressBar" class="bg-indigo-600 h-3 rounded-full transition-all duration-500"
+            <div class="w-full bg-slate-100 rounded-full h-3 sm:h-4 overflow-hidden shadow-inner">
+                <div id="progressBar" class="bg-indigo-600 h-full rounded-full transition-all duration-700 ease-out"
                     style="width: 0%"></div>
             </div>
         </div>
 
-        <h3 class="text-xl font-bold text-gray-900 mb-5">Course Modules</h3>
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-slate-800">Course Modules</h3>
+            <span class="bg-slate-200 text-slate-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" id="moduleCount">0 Modules</span>
+        </div>
+
         <div id="chaptersContainer" class="space-y-4">
-            <div class="animate-pulse flex gap-4 bg-white p-4 rounded-xl border h-24"></div>
+            <div class="animate-pulse flex gap-4 bg-white p-6 rounded-2xl border border-slate-200 h-24">
+                <div class="rounded-full bg-slate-100 h-12 w-12"></div>
+                <div class="flex-1 space-y-3 py-1">
+                    <div class="h-3 bg-slate-100 rounded w-3/4"></div>
+                    <div class="h-2 bg-slate-100 rounded w-1/2"></div>
+                </div>
+            </div>
         </div>
 
     </main>
@@ -43,7 +60,7 @@
     <script>
         const API_BASE = 'http://localhost:3000';
         const courseId = localStorage.getItem('currentCourseId');
-        let isGenerating = false; 
+        let isGenerating = false;
 
         async function loadDashboard() {
             if (!courseId) {
@@ -61,16 +78,17 @@
 
                 const chapters = course.chapters || [];
                 const container = document.getElementById('chaptersContainer');
+                document.getElementById('moduleCount').textContent = `${chapters.length} Modules`;
 
                 if (chapters.length === 0) {
                     container.innerHTML = `
-                    <div class="text-center p-10 bg-indigo-50 rounded-xl border border-indigo-100 animate-pulse">
+                    <div class="text-center p-12 bg-indigo-50 rounded-3xl border border-indigo-100 animate-pulse shadow-inner">
+                        <div class="text-4xl mb-4">🪄</div>
                         <h3 class="text-xl font-bold text-indigo-700 mb-2">AI is writing your course...</h3>
-                        <p class="text-indigo-600">Please wait, chapters will appear here one by one.</p>
-                        <div class="mt-4 text-sm text-gray-500">Auto-refreshing in 3 seconds...</div>
+                        <p class="text-indigo-600/70">Please wait, chapters will appear one by one.</p>
+                        <div class="mt-6 text-xs font-bold text-indigo-400 uppercase tracking-widest">Refreshing in 3s</div>
                     </div>
                 `;
-
                     setTimeout(loadDashboard, 3000);
                     return;
                 }
@@ -78,15 +96,15 @@
                 if (course.status === 'generating') {
                     if (!isGenerating) {
                         const statusDiv = document.createElement('div');
-                        statusDiv.className = "text-sm text-indigo-600 font-medium mb-4 animate-pulse";
-                        statusDiv.innerText = "⚡ Generating more chapters...";
+                        statusDiv.className = "flex items-center gap-2 text-sm text-indigo-600 font-bold mb-4 animate-pulse px-2";
+                        statusDiv.innerHTML = `<span>⚡</span> Generating more chapters...`;
                         container.parentNode.insertBefore(statusDiv, container);
                         isGenerating = true;
                     }
                     setTimeout(loadDashboard, 5000);
                 }
 
-                const total = chapters.length; 
+                const total = chapters.length;
                 const completed = chapters.filter(c => c.isCompleted).length;
                 const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -102,33 +120,33 @@
                     const isActive = !isCompleted && isPreviousCompleted;
                     const isLocked = !isCompleted && !isPreviousCompleted;
 
-                    let icon = `<span class="text-gray-400 font-bold">${index + 1}</span>`;
+                    let icon = `<span class="text-slate-400 font-bold">${index + 1}</span>`;
                     let btnText = "Locked";
-                    let btnClass = "bg-gray-100 text-gray-400 cursor-not-allowed";
-                    let cardClass = "opacity-75 bg-gray-50";
+                    let btnClass = "bg-slate-100 text-slate-400 cursor-not-allowed";
+                    let cardClass = "opacity-60 bg-slate-50 border-slate-200";
 
                     if (isCompleted) {
-                        icon = `✅`;
+                        icon = `<span class="text-emerald-500">✓</span>`;
                         btnText = "Review";
-                        btnClass = "bg-green-100 text-green-700 hover:bg-green-200";
-                        cardClass = "bg-white border-green-200";
+                        btnClass = "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95";
+                        cardClass = "bg-white border-emerald-100 shadow-sm shadow-emerald-50";
                     } else if (isActive) {
-                        icon = `▶️`;
-                        btnText = "Start Learning";
-                        btnClass = "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md";
-                        cardClass = "bg-white border-indigo-200 ring-2 ring-indigo-50";
+                        icon = `<span class="text-indigo-600">▶</span>`;
+                        btnText = "Start Now";
+                        btnClass = "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100 active:scale-95";
+                        cardClass = "bg-white border-indigo-200 ring-2 ring-indigo-500/10 scale-[1.02] z-10";
                     }
 
                     const div = document.createElement('div');
-                    div.className = `flex items-center justify-between p-5 rounded-xl border transition-all ${cardClass}`;
+                    div.className = `card-transition flex mobile-stack items-center justify-between p-5 sm:p-6 rounded-2xl border ${cardClass}`;
                     div.innerHTML = `
-                    <div class="flex items-center gap-5">
-                        <div class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-lg">
+                    <div class="flex items-center gap-4 sm:gap-6 w-full">
+                        <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-white border border-slate-200 text-xl shadow-sm">
                             ${icon}
                         </div>
-                        <div>
-                            <h4 class="font-bold text-gray-900 text-lg">${chapter.title}</h4>
-                            <span class="text-xs uppercase font-bold tracking-wider text-gray-400">
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-slate-900 text-base sm:text-lg truncate">${chapter.title}</h4>
+                            <span class="text-[10px] sm:text-xs uppercase font-black tracking-widest ${isLocked ? 'text-slate-400' : (isCompleted ? 'text-emerald-500' : 'text-indigo-500')}">
                                 ${isLocked ? 'Locked' : (isCompleted ? 'Completed' : 'Current Module')}
                             </span>
                         </div>
@@ -136,7 +154,7 @@
                     <button 
                         onclick="openChapter('${chapter._id}')"
                         ${isLocked ? 'disabled' : ''}
-                        class="px-5 py-2.5 rounded-lg font-medium transition-colors ${btnClass}">
+                        class="mobile-full-btn px-6 py-3 rounded-xl font-bold text-sm transition-all card-transition ${btnClass}">
                         ${btnText}
                     </button>
                 `;
@@ -146,13 +164,13 @@
             } catch (error) {
                 console.error("Error loading dashboard:", error);
                 document.getElementById('chaptersContainer').innerHTML =
-                    `<p class="text-red-500">Error loading course data. Make sure backend is running.</p>`;
+                    `<div class="p-6 bg-red-50 text-red-600 rounded-2xl border border-red-100 font-medium">Error loading course data. Please check your connection.</div>`;
             }
         }
 
         function openChapter(id) {
             localStorage.setItem('currentChapterId', id);
-            window.location.href = 'chapter-view.html'; 
+            window.location.href = 'chapter-view.html';
         }
 
         loadDashboard();

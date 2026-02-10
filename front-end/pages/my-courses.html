@@ -2,168 +2,133 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>EduPlan AI — My Courses</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        /* Плавное появление карточек */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .course-card { animation: fadeIn 0.4s ease forwards; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased pb-20 md:pb-0">
 
-    <div class="flex h-screen overflow-hidden">
-
-        <aside class="hidden md:flex md:flex-col w-72 bg-white border-r border-slate-200 z-20">
-            <div class="p-6">
+    <div class="flex h-screen overflow-hidden flex-col md:flex-row">
+        <aside class="hidden md:flex md:flex-col w-72 bg-white border-r border-slate-200 z-20 shrink-0">
+            <div class="p-8">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-200">
-                        E
-                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-100">E</div>
                     <span class="text-xl font-bold text-slate-900 tracking-tight">EduPlan AI</span>
                 </div>
             </div>
-
-            <nav class="flex-1 px-4 space-y-2 mt-4">
-                <a href="my-courses.html" class="flex items-center px-4 py-3 bg-indigo-50 text-indigo-700 font-medium rounded-xl transition-all shadow-sm ring-1 ring-indigo-100">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                    My Courses
+            <nav class="flex-1 px-4 space-y-2">
+                <a href="my-courses.html" class="flex items-center px-4 py-3 bg-indigo-50 text-indigo-700 font-bold rounded-2xl transition-all shadow-sm ring-1 ring-indigo-100">
+                    <span class="text-xl mr-3">📚</span> My Courses
                 </a>
-                
-                <a href="account.html" class="flex items-center px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                    Profile
+                <a href="account.html" class="flex items-center px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-2xl transition-all">
+                    <span class="text-xl mr-3">👤</span> Profile
                 </a>
-                
             </nav>
-
-           
         </aside>
 
         <div class="flex-1 flex flex-col overflow-hidden relative">
-
-            <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-900">My Learning</h1>
-                    <p class="text-sm text-slate-500">Welcome back, continue where you left off</p>
+            <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 md:px-10 py-4 flex items-center justify-between sticky top-0 z-30">
+                <div class="flex items-center gap-4">
+                    <div class="md:hidden w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">E</div>
+                    <div>
+                        <h1 class="text-xl md:text-3xl font-black text-slate-900 tracking-tight">My Learning</h1>
+                        <p class="hidden md:block text-sm text-slate-400 font-medium">Continue your education journey</p>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-4 sm:gap-6">
-                    <div class="relative hidden lg:block">
-                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        <input type="text" placeholder="Search courses..." class="pl-10 pr-4 py-2.5 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 w-64 transition-all">
-                    </div>
-
-                    <button onclick="openModal()" class="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium shadow-md transition-all">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
-                        New Course
+                <div class="flex items-center gap-4">
+                    <button onclick="openModal()" class="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 transition-all active:scale-95">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Create New
                     </button>
-
-                    <button class="relative p-2 text-slate-500 hover:text-indigo-600 transition-colors">
-                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                        </svg>
-                    </button>
-
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 p-0.5 shadow-md cursor-pointer hover:shadow-indigo-200 transition-all">
-                        <img src="https://ui-avatars.com/api/?name=User&background=fff&color=4f46e5" alt="Profile" class="w-full h-full rounded-full object-cover border-2 border-white" />
+                    <div class="w-10 h-10 rounded-full border-2 border-white shadow-md overflow-hidden bg-slate-200">
+                        <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="User" />
                     </div>
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6 lg:p-10 scroll-smooth relative">
-
-                <button onclick="openModal()" class="w-full mb-8 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 transition-all flex justify-center items-center gap-3 text-lg sm:text-base">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Create New Course
-                </button>
-
-                <div id="loadingSkeleton" class="hidden grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                    <div class="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm">
-                        <div class="h-40 bg-slate-100 rounded-2xl mb-4 animate-pulse"></div>
-                        <div class="h-6 bg-slate-100 rounded w-3/4 mb-3 animate-pulse"></div>
-                        <div class="h-4 bg-slate-100 rounded w-1/2 mb-6 animate-pulse"></div>
-                        <div class="flex justify-between items-center">
-                            <div class="h-8 w-24 bg-slate-100 rounded-lg animate-pulse"></div>
-                            <div class="h-8 w-8 bg-slate-100 rounded-full animate-pulse"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="coursesList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-24"></div>
-
-                <div id="emptyState" class="hidden flex-col items-center justify-center py-24 text-center">
-                    <div class="w-32 h-32 bg-indigo-50 rounded-full flex items-center justify-center mb-8 shadow-inner">
-                        <span class="text-6xl filter drop-shadow-md">🎓</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-900 mb-3">No courses yet</h3>
-                    <p class="text-slate-500 max-w-md mb-8 leading-relaxed">Start your learning journey — create your first AI-powered course today.</p>
-                    <button onclick="openModal()" class="px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow-xl shadow-indigo-200 hover:shadow-2xl transition-all transform hover:-translate-y-1 text-lg">
-                        Create Course →
+            <main class="flex-1 overflow-y-auto p-4 md:p-10 scroll-smooth">
+                <div class="md:hidden mb-6 bg-gradient-to-br from-indigo-600 to-purple-700 p-6 rounded-[2.5rem] text-white shadow-xl shadow-indigo-100">
+                    <h2 class="text-2xl font-bold mb-1">Hello! 👋</h2>
+                    <p class="text-indigo-100 text-sm opacity-90 mb-4">Ready to learn something new today?</p>
+                    <button onclick="openModal()" class="w-full py-3 bg-white text-indigo-600 rounded-2xl font-bold shadow-sm active:scale-95 transition-all text-sm">
+                        + Start New Course
                     </button>
                 </div>
 
+                <div class="flex items-center justify-between mb-6 px-2">
+                    <h3 class="font-black text-slate-400 uppercase tracking-widest text-xs">Recent Courses</h3>
+                    <button onclick="loadCourses()" class="text-indigo-600 text-xs font-bold uppercase tracking-tighter">Refresh ↻</button>
+                </div>
+
+                <div id="loadingSkeleton" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-[2rem] p-4 border border-slate-100 animate-pulse">
+                        <div class="h-32 bg-slate-100 rounded-2xl mb-4"></div>
+                        <div class="h-6 bg-slate-100 rounded w-3/4 mb-2"></div>
+                        <div class="h-3 bg-slate-100 rounded w-1/2"></div>
+                    </div>
+                </div>
+
+                <div id="coursesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+                <div id="emptyState" class="hidden flex flex-col items-center justify-center py-20 text-center">
+                    <div class="text-7xl mb-6">🚀</div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Your library is empty</h3>
+                    <p class="text-slate-500 max-w-xs mb-8 text-sm">Create your first AI-powered course and start learning in seconds.</p>
+                </div>
             </main>
+
+            <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200 px-8 py-3 flex justify-around items-center z-40 safe-bottom shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                <a href="my-courses.html" class="flex flex-col items-center gap-1 text-indigo-600 transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <span class="text-[10px] font-bold">Library</span>
+                </a>
+                <div class="-mt-12">
+                    <button onclick="openModal()" class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-2xl shadow-indigo-300 border-4 border-white active:scale-90 transition-transform">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    </button>
+                </div>
+                <a href="account.html" class="flex flex-col items-center gap-1 text-slate-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <span class="text-[10px] font-bold">Profile</span>
+                </a>
+            </nav>
         </div>
     </div>
 
-    <button onclick="openModal()" class="fixed bottom-6 right-6 z-40 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-2xl flex items-center justify-center text-3xl font-light transition-all hover:scale-110 focus:outline-none focus:ring-4 focus:ring-indigo-300">
-        +
-    </button>
-
-    <div id="createModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
-        <div class="flex min-h-full items-center justify-center p-4 text-center">
-            <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg border border-slate-100">
-                <div class="bg-indigo-600 px-6 py-8 text-white relative overflow-hidden">
-                    <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-                    <h3 class="text-2xl font-bold relative z-10" id="modal-title">New Course</h3>
-                    <p class="text-indigo-100 text-sm mt-2 relative z-10">Describe what you want to learn — AI will build your plan</p>
+    <div id="createModal" class="hidden fixed inset-0 z-[60] overflow-hidden" role="dialog">
+        <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+        <div class="flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4">
+            <div class="relative w-full sm:max-w-lg transform overflow-hidden rounded-t-[3rem] sm:rounded-[2.5rem] bg-white shadow-2xl transition-all border border-slate-100">
+                <div class="bg-indigo-600 px-8 py-8 text-white">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-2xl font-black">Build Course</h3>
+                        <button onclick="closeModal()" class="text-indigo-200 hover:text-white text-2xl font-light">✕</button>
+                    </div>
+                    <p class="text-indigo-100 text-sm font-medium opacity-80">Describe your goal, AI does the rest.</p>
                 </div>
 
-                <form id="createCourseForm" class="p-8">
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Course Title</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                                    </svg>
-                                </div>
-                                <input type="text" id="courseTitle" required placeholder="e.g. Advanced Python & FastAPI" class="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all font-medium text-slate-800">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">What do you want to learn?</label>
-                            <textarea id="courseTopics" required rows="5" placeholder="Describe topics, level, goals, desired depth, projects, etc..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none font-medium text-slate-800"></textarea>
-                            <p class="text-xs text-slate-400 mt-2 text-right">0/800 characters</p>
-                        </div>
+                <form id="createCourseForm" class="p-8 space-y-6">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Topic Title</label>
+                        <input type="text" id="courseTitle" required placeholder="e.g. Psychology of Design" class="w-full px-5 py-4 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-slate-700">
                     </div>
-
-                    <div class="mt-8 flex gap-3 flex-row-reverse">
-                        <button type="submit" id="generateBtn" class="flex-1 inline-flex justify-center items-center rounded-xl bg-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg hover:bg-indigo-700 hover:shadow-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all">
-                            Generate Plan 🪄
-                        </button>
-                        <button type="button" onclick="closeModal()" class="flex-1 inline-flex justify-center rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 transition-all">
-                            Cancel
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Detailed Focus</label>
+                        <textarea id="courseTopics" required rows="4" placeholder="What exactly should we cover?" class="w-full p-5 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none font-medium text-slate-600"></textarea>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button type="submit" id="generateBtn" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black shadow-xl shadow-indigo-100 active:scale-[0.98] transition-all">
+                            Generate Curriculum 🪄
                         </button>
                     </div>
                 </form>
@@ -172,58 +137,22 @@
     </div>
 
     <script>
-        const API_BASE = ('http://localhost:3000');
+        const API_BASE = 'http://localhost:3000';
         const userId = localStorage.getItem('userId');
         const modal = document.getElementById('createModal');
         const coursesList = document.getElementById('coursesList');
         const emptyState = document.getElementById('emptyState');
         const loadingSkeleton = document.getElementById('loadingSkeleton');
 
-        const errorBanner = document.createElement('div');
-        errorBanner.id = 'backendErrorBanner';
-        errorBanner.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-50 hidden bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-3';
-        errorBanner.innerHTML = `<span id="backendErrorText">Backend unreachable</span><button id="retryBtn" class="bg-white/20 hover:bg-white/30 text-sm px-3 py-1 rounded">Retry</button>`;
-        document.body.appendChild(errorBanner);
-        document.getElementById('retryBtn').addEventListener('click', () => { loadCourses(); });
+        if (!userId || userId === 'undefined') { window.location.href = 'LoggingIn.html'; }
 
-        function showBackendError(msg) {
-            const el = document.getElementById('backendErrorBanner');
-            document.getElementById('backendErrorText').textContent = msg || 'Backend unreachable';
-            el.classList.remove('hidden');
-        }
-        function hideBackendError() { document.getElementById('backendErrorBanner').classList.add('hidden'); }
-
-        if (!userId || userId === 'undefined') {
-            
-            alert('You are not signed in — please sign in first.');
-            window.location.href = 'LoggingIn.html';
-        }
-
-        function openModal() {
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-            document.getElementById('createCourseForm').reset();
-        }
-
-        function openCourse(courseId) {
-            localStorage.setItem('currentCourseId', courseId);
-            window.location.href = 'course-dashboard.html';
-        }
+        function openModal() { modal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        function closeModal() { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }
+        function openCourse(id) { localStorage.setItem('currentCourseId', id); window.location.href = 'course-dashboard.html'; }
 
         function getRandomGradient() {
-            const gradients = [
-                'from-pink-500 to-rose-500',
-                'from-indigo-500 to-purple-600',
-                'from-blue-400 to-emerald-400',
-                'from-orange-400 to-amber-500',
-                'from-cyan-500 to-blue-500'
-            ];
-            return gradients[Math.floor(Math.random() * gradients.length)];
+            const grads = ['from-indigo-500 to-purple-600', 'from-rose-500 to-orange-500', 'from-emerald-500 to-teal-600', 'from-blue-500 to-indigo-600', 'from-amber-400 to-pink-500'];
+            return grads[Math.floor(Math.random() * grads.length)];
         }
 
         async function loadCourses() {
@@ -232,87 +161,52 @@
             emptyState.classList.add('hidden');
 
             try {
-                const response = await fetch(`${API_BASE}/api/courses?userId=${userId}`);
-                if (!response.ok) throw new Error(`Server returned ${response.status}`);
-                const result = await response.json();
-
-                hideBackendError();
+                const res = await fetch(`${API_BASE}/api/courses?userId=${userId}`);
+                const courses = await res.json();
                 loadingSkeleton.classList.add('hidden');
 
-                const courses = result.data || result || [];
-
-                if (courses.length === 0) {
+                if (!courses.length) {
                     emptyState.classList.remove('hidden');
-                    emptyState.classList.add('flex');
-                } else {
-                    emptyState.classList.add('hidden');
-                    emptyState.classList.remove('flex');
-
-                    courses.forEach(course => {
-                        const div = document.createElement('div');
-                        div.className = "group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer";
-
-                        const isCompleted = course.status === 'completed';
-                        const progress = course.progress || 0;
-                        const gradient = getRandomGradient();
-                        const chaptersCount = 5;
-                        const duration = Math.floor(Math.random() * 10) + 2;
-
-                        div.innerHTML = `
-                            <div class="h-32 bg-gradient-to-r ${gradient} relative" onclick="openCourse('${course._id}')">
-                                <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs font-bold border border-white/20">
-                                    AI Generated
-                                </div>
-                            </div>
-                            <div class="p-6 flex-1 flex flex-col">
-                                <h3 class="font-bold text-xl text-slate-900 mb-2 line-clamp-2 leading-tight group-hover:text-indigo-700 transition-colors">${course.title}</h3>
-                                <p class="text-sm text-slate-500 mb-6 line-clamp-3">Structured learning with explanations, examples, and exercises powered by AI.</p>
-                                
-                                <div class="flex items-center gap-5 text-xs font-medium text-slate-500 mb-6 mt-auto">
-                                    <div class="flex items-center gap-1.5">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                                        ${chaptersCount} chapters
-                                    </div>
-                                    <div class="flex items-center gap-1.5">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        ~${duration} h
-                                    </div>
-                                </div>
-
-                                <div class="space-y-2 mb-6">
-                                    <div class="flex justify-between text-xs font-bold">
-                                        <span class="${isCompleted ? 'text-emerald-600' : 'text-indigo-600'}">${isCompleted ? 'Completed' : 'In Progress'}</span>
-                                        <span class="text-slate-500">${progress}%</span>
-                                    </div>
-                                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                                        <div class="h-2.5 rounded-full ${isCompleted ? 'bg-emerald-500' : 'bg-indigo-500'} transition-all duration-1000" style="width: ${progress}%"></div>
-                                    </div>
-                                </div>
-
-                                <button onclick="openCourse('${course._id}')" class="w-full py-3 rounded-xl border border-indigo-100 bg-white text-indigo-600 font-bold text-sm hover:bg-indigo-600 hover:text-white transition-all shadow-sm group-hover:shadow-md flex justify-center items-center gap-2">
-                                    ${isCompleted ? 'Review' : 'Continue'}
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                </button>
-                            </div>
-                        `;
-                        coursesList.appendChild(div);
-                    });
+                    return;
                 }
-            } catch (error) {
-                console.error("Error loading courses:", error);
-                loadingSkeleton.classList.add('hidden');
-            }
+
+                courses.forEach((course, i) => {
+                    const div = document.createElement('div');
+                    div.className = "course-card bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col active:scale-[0.98] transition-all group";
+                    div.style.animationDelay = `${i * 0.1}s`;
+
+                    const total = course.chapters ? course.chapters.length : 0;
+                    const completed = course.chapters ? course.chapters.filter(c => c.isCompleted).length : 0;
+                    const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+                    const gradient = getRandomGradient();
+
+                    div.innerHTML = `
+                        <div class="h-32 bg-gradient-to-br ${gradient} p-6 flex flex-col justify-between relative cursor-pointer" onclick="openCourse('${course._id}')">
+                            <div class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-xl">📚</div>
+                            <h3 class="font-bold text-lg text-white line-clamp-1">${course.title}</h3>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">${total} Modules</span>
+                                <span class="text-xs font-bold text-indigo-600">${progress}%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mb-6">
+                                <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000" style="width: ${progress}%"></div>
+                            </div>
+                            <button onclick="openCourse('${course._id}')" class="w-full py-3 bg-slate-50 text-slate-700 font-bold rounded-xl hover:bg-indigo-600 hover:text-white transition-all text-xs">
+                                ${progress === 100 ? 'Review Course' : 'Continue Learning'}
+                            </button>
+                        </div>
+                    `;
+                    coursesList.appendChild(div);
+                });
+            } catch (err) { loadingSkeleton.classList.add('hidden'); }
         }
 
         document.getElementById('createCourseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            const titleInput = document.getElementById('courseTitle');
-            const topicsInput = document.getElementById('courseTopics');
             const btn = document.getElementById('generateBtn');
-
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating...`;
+            btn.innerHTML = `🪄 Building Plan...`;
             btn.disabled = true;
 
             try {
@@ -321,36 +215,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         userId: userId,
-                        title: titleInput.value.trim(),
-                        topicRequest: topicsInput.value.trim()
-                    }),
-                    signal: (new AbortController()).signal
+                        title: document.getElementById('courseTitle').value,
+                        topicRequest: document.getElementById('courseTopics').value
+                    })
                 });
-
-                if (!response.ok) {
-                    const data = await response.json().catch(() => ({}));
-                    showBackendError(data.error || `Create failed (${response.status})`);
-                    throw new Error(data.error || 'Create failed');
-                }
-
                 const data = await response.json();
-
-                hideBackendError();
                 localStorage.setItem('pendingCourse', JSON.stringify({
-                    courseId: data._id || data.courseId,
-                    title: titleInput.value.trim(),
+                    courseId: data._id,
+                    title: document.getElementById('courseTitle').value,
                     outline: data.initialPlan || data.plan
                 }));
-
-                closeModal();
                 window.location.href = 'course-outline.html';
-            } catch (err) {
-                console.error(err);
-                alert('Server connection error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+            } catch (err) { alert('Try again'); btn.disabled = false; btn.innerHTML = 'Generate Plan 🪄'; }
         });
 
         window.onload = loadCourses;

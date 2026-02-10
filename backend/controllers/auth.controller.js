@@ -60,17 +60,29 @@ exports.login = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-    const { name, surname, age, email, password } = req.body;
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    try {
+        const { name, surname, age, email, password } = req.body;
+        
+        const updateData = { name, surname, age, email };
 
-    const changedUser = await User.findByIdAndUpdate(
-        req.params.id,
-        { name, surname, age, email, password: hashedPassword },
-        { new: true, runValidators: true }
-    );
-    if (!changedUser) return res.status(404).json({ error: "User not found" });
-    res.json(changedUser);
+        if (password && password.trim() !== "") {
+            const saltRounds = 10;
+            updateData.password = await bcrypt.hash(password, saltRounds);
+        }
+
+        const changedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            { $set: updateData }, 
+            { new: true, runValidators: true }
+        );
+
+        if (!changedUser) return res.status(404).json({ error: "User not found" });
+        
+        res.json(changedUser);
+    } catch (error) {
+        console.error("Update User Error:", error);
+        res.status(400).json({ error: error.message });
+    }
 };
 
 

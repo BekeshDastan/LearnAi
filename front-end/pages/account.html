@@ -3,246 +3,197 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>EduPlan AI — Profile</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen antialiased">
+<body class="bg-slate-50 min-h-screen antialiased flex flex-col md:flex-row pb-20 md:pb-0">
 
-  <div class="flex h-screen">
+  <aside class="hidden md:flex md:flex-col w-72 bg-white border-r border-slate-200 shrink-0">
+    <div class="p-6 border-b border-slate-200">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-100">
+          E</div>
+        <span class="text-xl font-bold text-slate-900 tracking-tight">EduPlan AI</span>
+      </div>
+    </div>
+    <nav class="flex-1 px-4 py-6 space-y-2">
+      <a href="my-courses.html"
+        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">
+        <span class="text-xl mr-3">📚</span> My Courses
+      </a>
+      <a href="#"
+        class="flex items-center px-4 py-3 bg-indigo-50 text-indigo-700 font-semibold rounded-xl transition-all">
+        <span class="text-xl mr-3">👤</span> Profile
+      </a>
+    </nav>
+  </aside>
 
-    <!-- Sidebar -->
-    <aside class="hidden md:flex md:flex-col w-72 bg-white border-r border-gray-200">
-      <div class="p-6 border-b border-gray-200">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">
-            E
+  <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+
+    <header
+      class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 md:px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+      <h1 class="text-lg md:text-xl font-bold text-slate-900">My Account</h1>
+      <button onclick="logout()" class="text-xs font-bold text-red-500 uppercase tracking-wider">Logout</button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-10">
+      <div class="max-w-3xl mx-auto">
+
+        <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+
+          <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 px-6 py-8 md:px-10 md:py-12 text-white relative">
+            <div class="flex flex-col sm:flex-row items-center gap-6 relative z-10">
+              <div
+                class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-white/20 backdrop-blur-md border-4 border-white/40 shadow-xl overflow-hidden">
+                <img src="https://ui-avatars.com/api/?name=User&background=fff&color=4f46e5" alt="Avatar"
+                  class="w-full h-full object-cover" id="avatarImg" />
+              </div>
+              <div class="text-center sm:text-left">
+                <h2 id="headerName" class="text-xl md:text-2xl font-bold">Loading...</h2>
+                <p id="headerEmail" class="text-indigo-100/80 text-sm">email@example.com</p>
+              </div>
+            </div>
           </div>
-          <span class="text-xl font-bold text-gray-900">EduPlan AI</span>
+
+          <div class="p-6 md:p-10">
+            <div id="viewMode">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">Personal Info</h3>
+                <button onclick="toggleEditMode()"
+                  class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-100">
+                  Edit Profile
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                <div class="bg-slate-50 p-4 rounded-2xl">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">First Name</p>
+                  <p class="font-semibold text-slate-900" id="viewName">--</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Last Name</p>
+                  <p class="font-semibold text-slate-900" id="viewSurname">--</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Age</p>
+                  <p class="font-semibold text-slate-900" id="viewAge">--</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Email</p>
+                  <p class="font-semibold text-slate-900 break-all" id="viewEmail">--</p>
+                </div>
+              </div>
+
+              <div class="pt-8 border-t border-slate-100">
+                <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Security</h3>
+                <div class="bg-slate-50 p-5 rounded-2xl flex items-center justify-between">
+                  <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Password</p>
+                    <p id="passwordDisplay" class="text-sm font-medium tracking-widest">••••••••••••</p>
+                  </div>
+                  <button onclick="revealPassword(this)"
+                    class="text-xs font-bold text-indigo-600 uppercase">Show</button>
+                </div>
+              </div>
+            </div>
+
+            <form id="editMode" class="hidden space-y-6">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <h3 class="text-lg font-bold text-slate-900">Editing Profile</h3>
+                <div class="flex w-full sm:w-auto gap-3">
+                  <button type="button" onclick="toggleEditMode()"
+                    class="flex-1 px-6 py-3 border border-slate-200 text-slate-600 rounded-xl font-bold text-sm">Cancel</button>
+                  <button type="submit"
+                    class="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-100">Save</button>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input type="text" id="editName" placeholder="Name"
+                    class="w-full px-4 py-4 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+                  <input type="text" id="editSurname" placeholder="Surname"
+                    class="w-full px-4 py-4 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+                </div>
+                <input type="number" id="editAge" placeholder="Age"
+                  class="w-full px-4 py-4 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+                <input type="email" id="editEmail" placeholder="Email"
+                  class="w-full px-4 py-4 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+              </div>
+
+              <div class="pt-6 border-t border-slate-100 space-y-4">
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Change Password</p>
+                <input type="password" id="newPasswordInput" placeholder="New Password (optional)"
+                  class="w-full px-4 py-4 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+                <input type="password" id="confirmPasswordInput" placeholder="Confirm New Password"
+                  class="w-full px-4 py-4 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+              </div>
+            </form>
+          </div>
         </div>
       </div>
+    </main>
 
-      <nav class="flex-1 px-3 py-6 space-y-1">
-        <a href="my-courses.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-          <span class="text-xl mr-3">📚</span>
-          My Courses
-        </a>
-        <a href="#" class="flex items-center px-4 py-3 bg-indigo-50 text-indigo-700 font-medium rounded-lg">
-          <span class="text-xl mr-3">👤</span>
-          Profile
-        </a>
-    
-      </nav>
-    </aside>
-
-    <div class="flex-1 flex flex-col overflow-hidden">
-
-      <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <h1 class="text-xl font-semibold text-gray-900">Profile</h1>
-        <div class="flex items-center gap-4">
-          <div class="text-right">
-            <p class="font-medium"></p>
-            <p class="text-sm text-gray-500"></p>
-          </div>
-          <div class="w-10 h-10 rounded-full bg-indigo-100 overflow-hidden border-2 border-indigo-200">
-            <img src=""
-              alt="Profile" class="w-full h-full object-cover" />
-          </div>
-        </div>
-      </header>
-
-      <main class="flex-1 overflow-y-auto p-6 lg:p-10">
-        <div class="max-w-3xl mx-auto">
-
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-
-            <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 px-8 py-12 text-white">
-              <div class="flex flex-col sm:flex-row items-center gap-8">
-                <div
-                  class="w-32 h-32 rounded-full bg-white/20 backdrop-blur-sm border-4 border-white/40 overflow-hidden">
-                  <img src="" alt="Profile picture" class="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <span id="headerName" class="font-medium">Bekesh Dastan</span>
-                  <span id="headerEmail" class="text-sm text-gray-500">dastan@example.com</span>
-                  <div class="mt-5 flex flex-wrap gap-8 text-indigo-100/90">
-                    <div>
-                      <span class="block text-xs uppercase tracking-wide opacity-80">Age</span>
-                      <span class="text-2xl font-semibold" id="showAge">19</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="p-8 lg:p-10">
-
-              <div id="viewMode">
-                <div class="flex justify-between items-center mb-8">
-                  <h3 class="text-xl font-bold text-gray-900">Personal Information</h3>
-                  <button onclick="toggleEditMode()"
-                    class="px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">
-                    Edit Profile
-                  </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                  <div>
-                    <p class="text-sm text-gray-500 mb-1">Name</p>
-                    <p class="text-lg font-medium text-gray-900" id="viewName">Dastan</p>
-                  </div>
-
-                  <div>
-                    <p class="text-sm text-gray-500 mb-1">Surname</p>
-                    <p class="text-lg font-medium text-gray-900" id="viewSurname">Bekesh</p>
-                  </div>
-
-                  <div>
-                    <p class="text-sm text-gray-500 mb-1">Age</p>
-                    <p class="text-lg font-medium text-gray-900" id="viewAge">18</p>
-                  </div>
-
-                  <div>
-                    <p class="text-sm text-gray-500 mb-1">Email</p>
-                    <p class="text-lg font-medium text-gray-900 break-all" id="viewEmail">dastan@example.com</p>
-                  </div>
-                </div>
-
-                <div class="pt-8 border-t border-gray-200">
-                  <h3 class="text-xl font-bold text-gray-900 mb-6">Security</h3>
-                  <div class="space-y-6">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <p class="text-sm text-gray-500 mb-1">Password</p>
-                        <p id="passwordDisplay" class="text-lg font-medium text-gray-900 tracking-widest">
-                          ••••••••••••
-                        </p>
-                      </div>
-                      <button
-                        onclick="document.getElementById('passwordDisplay').textContent = 'MySecurePass123'; this.style.display='none'"
-                        class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
-                        id="showPassword">
-                        Show
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <form id="editMode" class="hidden space-y-10">
-
-                <div class="flex justify-between items-center">
-                  <h3 class="text-xl font-bold text-gray-900">Edit Profile</h3>
-                  <div class="space-x-3">
-                    <button type="button" onclick="toggleEditMode()"
-                      class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                      Cancel
-                    </button>
-                    <button type="submit"
-                      class="px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">
-                      Save Changes
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 class="text-lg font-semibold text-gray-800 mb-4">Personal Information</h4>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                      <input type="text" value="Dastan" id="editName"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                    </div>
-
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Surname</label>
-                      <input type="text" value="Bekesh" id="editSurname"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                    </div>
-
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
-                      <input type="number" value="19" min="13" id="editAge"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                    </div>
-
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                      <input type="email" value="dastan@example.com" id="editEmail"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Password Change -->
-                <div class="pt-8 border-t border-gray-200">
-                  <h4 class="text-lg font-semibold text-gray-800 mb-4">Change Password</h4>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-                      <input type="password" id="currentPasswordInput" placeholder="•••••••••••"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        required />
-                    </div>
-
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                      <input type="password" id="newPasswordInput" placeholder="New password"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        required />
-                    </div>
-
-                    <div class="md:col-span-2">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
-                      <input type="password" id="confirmPasswordInput" placeholder="Confirm new password"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        required />
-                    </div>
-                  </div>
-
-                </div>
-
-              </form>
-
-            </div>
-          </div>
-
-        </div>
-      </main>
-    </div>
+    <nav
+      class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 px-8 py-3 flex justify-around items-center z-40 safe-bottom">
+      <a href="my-courses.html" class="flex flex-col items-center gap-1 text-slate-400">
+        <span class="text-xl">📚</span><span class="text-[10px] font-bold">Courses</span>
+      </a>
+      <a href="#" class="flex flex-col items-center gap-1 text-indigo-600">
+        <span class="text-xl">👤</span><span class="text-[10px] font-bold">Profile</span>
+      </a>
+    </nav>
   </div>
 
   <script>
+    const API_BASE = 'http://localhost:3000';
     const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
+    let userCache = null;
 
     async function loadUserProfile() {
       if (!userId || userId === "undefined") {
-        alert("Please log in first");
         window.location.href = "LoggingIn.html";
         return;
       }
 
       try {
-        const response = await fetch(`http://localhost:3000/auth/users/${userId}`);
+        const response = await fetch(`${API_BASE}/auth/users/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.status === 403) {
+          alert("Session expired. Please login again.");
+          window.location.href = "LoggingIn.html";
+          return;
+        }
+
         const user = await response.json();
+        userCache = user;
 
         if (response.ok) {
-          document.getElementById('headerName').textContent = `${user.surname} ${user.name}`;
+          document.getElementById('headerName').textContent = `${user.name} ${user.surname}`;
           document.getElementById('headerEmail').textContent = user.email;
           document.getElementById('viewName').textContent = user.name;
           document.getElementById('viewSurname').textContent = user.surname;
           document.getElementById('viewAge').textContent = user.age;
           document.getElementById('viewEmail').textContent = user.email;
-          document.getElementById('showAge').textContent = user.age;
-
-          const showBtn = document.getElementById('showPassword');
-          const passDisplay = document.getElementById('passwordDisplay');
-
-          showBtn.onclick = function () {
-            passDisplay.textContent = user.password;
-            showBtn.style.display = 'none';
-          };
 
           document.getElementById('editName').value = user.name;
           document.getElementById('editSurname').value = user.surname;
@@ -250,60 +201,72 @@
           document.getElementById('editEmail').value = user.email;
         }
       } catch (err) {
-        console.error("Error loading profile:", err);
+        console.error("Fetch error:", err);
+      }
+    }
+
+    function revealPassword(btn) {
+      if (userCache) {
+        document.getElementById('passwordDisplay').textContent = userCache.password;
+        btn.style.display = 'none';
       }
     }
 
     document.getElementById('editMode').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const newPassword = document.getElementById('newPasswordInput').value;
+      const confirmPassword = document.getElementById('confirmPasswordInput').value;
 
-      const currentPassword = document.querySelector('input[placeholder="•••••••••••"]').value;
-      const newPassword = document.querySelector('input[placeholder="New password"]').value;
-      const confirmPassword = document.querySelector('input[placeholder="Confirm new password"]').value;
-
-      if (newPassword !== confirmPassword) {
-        alert("New passwords do not match!");
+      if (newPassword && newPassword !== confirmPassword) {
+        alert("Passwords do not match!");
         return;
       }
 
       const updatedData = {
-        name: document.getElementById('editName').value,
-        surname: document.getElementById('editSurname').value,
-        age: document.getElementById('editAge').value,
-        email: document.getElementById('editEmail').value,
-        password: newPassword
+        name: document.getElementById('editName').value.trim(),
+        surname: document.getElementById('editSurname').value.trim(),
+        age: Number(document.getElementById('editAge').value),
+        email: document.getElementById('editEmail').value.trim(),
+        password: newPassword || userCache.password
       };
 
       try {
-        const response = await fetch(`http://localhost:3000/auth/users/${userId}`, {
+        const response = await fetch(`${API_BASE}/auth/users/${userId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify(updatedData)
         });
 
         const result = await response.json();
 
         if (response.ok) {
-          alert("Profile updated successfully!");
+          alert("Profile updated!");
           toggleEditMode();
           loadUserProfile();
         } else {
-          alert("Update failed: " + (result.error || "Unknown error"));
+          console.error("Server Error Detail:", result);
+          alert(`Update failed: ${result.error || result.message || 'Check your data'}`);
         }
       } catch (err) {
-        console.error("Error updating profile:", err);
-        alert("Server connection error.");
+        alert("Connection error.");
       }
     });
-
-    window.onload = loadUserProfile;
 
     function toggleEditMode() {
       document.getElementById('viewMode').classList.toggle('hidden');
       document.getElementById('editMode').classList.toggle('hidden');
     }
-  </script>
 
+    function logout() {
+      localStorage.clear();
+      window.location.href = "LoggingIn.html";
+    }
+
+    window.onload = loadUserProfile;
+  </script>
 </body>
 
 </html>
