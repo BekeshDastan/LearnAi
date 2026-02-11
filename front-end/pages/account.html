@@ -158,7 +158,6 @@
   </div>
 
   <script>
-    const API_BASE = 'http://localhost:3000';
     const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
     let userCache = null;
@@ -170,7 +169,7 @@
       }
 
       try {
-        const response = await fetch(`${API_BASE}/auth/users/${userId}`, {
+        const response = await fetch(`/auth/users/${userId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -231,7 +230,7 @@
       };
 
       try {
-        const response = await fetch(`${API_BASE}/auth/users/${userId}`, {
+        const response = await fetch(`/auth/users/${userId}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,
