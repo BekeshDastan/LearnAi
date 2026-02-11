@@ -58,7 +58,6 @@
     </main>
 
     <script>
-        const API_BASE = 'http://localhost:3000';
         const courseId = localStorage.getItem('currentCourseId');
         let isGenerating = false;
 
@@ -70,7 +69,7 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE}/api/courses/${courseId}`);
+                const response = await fetch(`/api/courses/${courseId}`);
                 if (!response.ok) throw new Error("Failed to fetch course");
                 const course = await response.json();
 

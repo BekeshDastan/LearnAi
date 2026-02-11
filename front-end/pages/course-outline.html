@@ -56,7 +56,6 @@
 </div>
 
 <script>
-  const API_BASE = 'http://localhost:3000';
 
   const pendingRaw = localStorage.getItem('pendingCourse');
   if (!pendingRaw) {
@@ -109,7 +108,7 @@
 
     try {
       const res = await fetch(
-        `${API_BASE}/api/courses/${pending.courseId}/confirm`,
+        `/api/courses/${pending.courseId}/confirm`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

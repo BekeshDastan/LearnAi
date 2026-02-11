@@ -113,7 +113,6 @@
   </div>
 
   <script>
-    const API_BASE = 'http://localhost:3000';
     const chapterId = localStorage.getItem('currentChapterId');
     const courseId = localStorage.getItem('currentCourseId');
 
@@ -131,7 +130,7 @@
 
     async function loadSidebar() {
       try {
-        const res = await fetch(`${API_BASE}/api/courses/${courseId}`);
+        const res = await fetch(`/api/courses/${courseId}`);
         const course = await res.json();
         const list = document.getElementById('sidebarList');
         if(!list) return;
@@ -182,7 +181,7 @@
 
     async function loadChapterContent() {
       try {
-        const response = await fetch(`${API_BASE}/api/courses/chapters/${chapterId}`);
+        const response = await fetch(`/api/courses/chapters/${chapterId}`);
         if (!response.ok) throw new Error("Failed to load");
         currentChapterData = await response.json();
 
@@ -273,7 +272,7 @@
     });
 
     async function markChapterAsDone() {
-      await fetch(`${API_BASE}/api/courses/chapters/${chapterId}/complete`, { method: 'POST' });
+      await fetch(`/api/courses/chapters/${chapterId}/complete`, { method: 'POST' });
     }
 
     function goToNextChapter() {
