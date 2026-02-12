@@ -4,7 +4,9 @@ Edu AI is an intelligent educational platform designed to simplify and personali
 
 The course creation process starts with an AI-generated learning plan that outlines the key topics, progression, and objectives. Once the plan is approved, Edu AI automatically generates detailed lectures for each topic, written in a clear and student-friendly format. To reinforce understanding, each lecture is accompanied by quizzes that allow users to test their knowledge and track their progress.
 
-Edu AI aims to make education more accessible, efficient, and adaptive by providing personalized learning paths, interactive content, and instant feedback. The platform is suitable for self-learners, students, and anyone who wants to quickly gain new knowledge in a structured and practical way.
+Edu AI aims to make education more accessible, efficient, and adaptive by providing personalized learning paths, interactive content, and instant feedback. The platform is suitable for self-learners, students, and anyone who wants to quickly gain new knowledge in a structured and practical way.<br><br><br>
+
+https://learnai-4wnf.onrender.com/pages/LoggingIn.html
 
 
 ## API DOCUMENTATION
