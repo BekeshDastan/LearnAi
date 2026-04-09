@@ -169,7 +169,7 @@
       }
 
       try {
-        const response = await fetch(`/auth/users/${userId}`, {
+        const response = await fetch(`http://localhost:3000/auth/users/${userId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -230,7 +230,7 @@
       };
 
       try {
-        const response = await fetch(`/auth/users/${userId}`, {
+        const response = await fetch(`http://localhost:3000/auth/users/${userId}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,

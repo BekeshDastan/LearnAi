@@ -1,0 +1,44 @@
+
+services:
+
+  mongo:
+    image: mongo:latest
+    container_name: app_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongodb_data:/data/db
+
+  backend:
+    build: 
+      context: ../backend
+    container_name: app_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/Edu_Plan
+    depends_on:
+      - mongo
+    env_file:
+      - ../backend/.env 
+    volumes:
+      - ../backend:/app
+      - /app/node_modules
+
+  frontend:
+    build: 
+      context: ../front-end
+    container_name: app_frontend
+    restart: always
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    volumes:
+      - ../front-end:/usr/share/nginx/html
+
+
+volumes:
+  mongodata:

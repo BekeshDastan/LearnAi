@@ -130,7 +130,7 @@
 
     async function loadSidebar() {
       try {
-        const res = await fetch(`/api/courses/${courseId}`);
+        const res = await fetch(`http://localhost:3000/api/courses/${courseId}`);
         const course = await res.json();
         const list = document.getElementById('sidebarList');
         if(!list) return;
@@ -181,7 +181,7 @@
 
     async function loadChapterContent() {
       try {
-        const response = await fetch(`/api/courses/chapters/${chapterId}`);
+        const response = await fetch(`http://localhost:3000/api/courses/chapters/${chapterId}`);
         if (!response.ok) throw new Error("Failed to load");
         currentChapterData = await response.json();
 
@@ -272,7 +272,7 @@
     });
 
     async function markChapterAsDone() {
-      await fetch(`/api/courses/chapters/${chapterId}/complete`, { method: 'POST' });
+      await fetch(`http://localhost:3000/api/courses/chapters/${chapterId}/complete`, { method: 'POST' });
     }
 
     function goToNextChapter() {

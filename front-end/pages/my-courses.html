@@ -159,7 +159,7 @@
             emptyState.classList.add('hidden');
 
             try {
-                const res = await fetch(`/api/courses?userId=${userId}`);
+                const res = await fetch(`http://localhost:3000/api/courses?userId=${userId}`);
                 const courses = await res.json();
                 loadingSkeleton.classList.add('hidden');
 
@@ -208,7 +208,7 @@
             btn.disabled = true;
 
             try {
-                const response = await fetch(`/api/courses/init`, {
+                const response = await fetch(`http://localhost:3000/api/courses/init`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

@@ -18,8 +18,13 @@ exports.register = async (req, res) => {
     const { name, surname, age, email, password } = req.body;
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const newUser = await User.create({ name, surname, age, email, password: hashedPassword });
-    res.status(201).json(newUser);
+    try{
+         const newUser = await User.create({ name, surname, age, email, password: hashedPassword });
+         res.status(201).json(newUser);
+    } catch (error) {
+        console.error("Registration Error:", error);
+        return res.status(400).json({ error: error.message });
+    }
 };
 
 exports.login = async (req, res) => {

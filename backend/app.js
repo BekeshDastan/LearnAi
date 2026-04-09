@@ -1,4 +1,3 @@
-
 require('dotenv').config(); 
 
 const express = require("express");
@@ -12,49 +11,43 @@ const aiRoutes = require('./routes/ai.routes');
 
 const app = express();
 
+// const frontEndPath = path.resolve(__dirname, "../front-end");
+// const indexPath = path.join(frontEndPath, "index.html");
+
+// console.log("--- System Check ---");
+// console.log("Looking for Front-end at:", frontEndPath);
+
+// if (!fs.existsSync(frontEndPath)) {
+//     console.error("❌ ERROR: Front-end directory NOT found!");
+// } else {
+//     console.log("✅ Front-end directory found!");
+// }
+
 app.use(cors());
 app.use(express.json());
 
-const frontEndPath = path.join(__dirname, "../front-end");
-console.log("Serving static files from:", frontEndPath);
+// app.use(express.static(frontEndPath));
 
-if (!fs.existsSync(frontEndPath)) {
-  console.error("ERROR: Front-end folder not found at:", frontEndPath);
-} else {
-  console.log("Front-end folder found!");
-}
-
-app.get("/test", (req, res) => {
-  res.json({ message: "Server is working!", frontEndPath });
-});
+// app.get("/test", (req, res) => {
+//     res.json({ message: "Server is working!", path: frontEndPath });
+// });
 
 app.use("/auth", authRoutes);
-
 app.use('/api/courses', courseRoutes);
+app.use('/api/ai', aiRoutes); 
 
-app.use('/api/courses', aiRoutes); 
 
-app.use('/courses', courseRoutes);
-
-const pagesPath = path.join(frontEndPath, "pages");
-if (fs.existsSync(pagesPath)) {
-  console.log("Pages directory found!");
-} else {
-  console.error("ERROR: Pages directory not found!");
-}
-
-app.use(express.static(frontEndPath, {
-  index: 'index.html',
-  extensions: ['html', 'htm'],
-  dotfiles: 'ignore'
-}));
+// app.get("/", (req, res) => {
+//     if (fs.existsSync(indexPath)) {
+//         res.sendFile(indexPath);
+//     } else {
+//         res.status(404).send("index.html not found in front-end folder");
+//     }
+// });
 
 app.use((req, res) => {
-  res.status(404).send(`
-    <h1>404 - Page Not Found</h1>
-    <p>Requested path: ${req.path}</p>
-    <a href="/">Go Home</a>
-  `);
+    console.log(`404 error at: ${req.url}`);
+    res.status(404).send("<h1>404 - Page Not Found</h1>");
 });
 
 module.exports = app;

@@ -69,7 +69,7 @@
             }
 
             try {
-                const response = await fetch(`/api/courses/${courseId}`);
+                const response = await fetch(`http://localhost:3000/api/courses/${courseId}`);
                 if (!response.ok) throw new Error("Failed to fetch course");
                 const course = await response.json();
 
