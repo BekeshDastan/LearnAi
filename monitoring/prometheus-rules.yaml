@@ -1,0 +1,14 @@
+groups:
+  - name: registration_alerts
+    interval: 30s
+    rules:
+      - alert: TooManyRegistrationFailures
+        expr: rate(registrations_total{result="failure"}[1m]) > 0.05
+        for: 3m
+        annotations:
+          summary: "Too many registration failures detected"
+          description: "Registration failure rate is {{ $value }} errors/sec (threshold: 0.05 errors/sec = 3 failures/min)"
+        labels:
+          severity: warning
+
+

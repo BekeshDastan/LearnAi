@@ -1,6 +1,4 @@
-
 services:
-
   mongo:
     image: mongo:latest
     container_name: app_mongo
@@ -11,7 +9,7 @@ services:
       - ./mongodb_data:/data/db
 
   backend:
-    build: 
+    build:
       context: ../backend
     container_name: app_backend
     restart: always
@@ -22,23 +20,72 @@ services:
     depends_on:
       - mongo
     env_file:
-      - ../backend/.env 
+      - ../backend/.env
     volumes:
       - ../backend:/app
       - /app/node_modules
 
   frontend:
-    build: 
+    build:
       context: ../front-end
     container_name: app_frontend
     restart: always
     ports:
-      - "8081:80"
+      - "8080:80"
     depends_on:
       - backend
     volumes:
       - ../front-end:/usr/share/nginx/html
 
+  promtail:
+    image: grafana/promtail:latest
+    container_name: app_promtail
+    restart: always
+    ports:
+      - "9080:9080"
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./promtail-config.yaml:/etc/promtail/config.yaml
+    command: -config.file=/etc/promtail/config.yaml
+    privileged: true
+
+  loki:
+    image: grafana/loki:latest
+    container_name: app_loki
+    restart: always
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: app_prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./prometheus-rules.yaml:/etc/prometheus/prometheus-rules.yaml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: app_grafana
+    restart: always
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+      - loki
+    volumes:
+      - grafanadata:/var/lib/grafana
+      - ./grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
 
 volumes:
   mongodata:
+  grafanadata:
+  promtheusdata:
