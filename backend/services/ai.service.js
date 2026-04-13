@@ -1,34 +1,47 @@
 require('dotenv').config();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const JSON5 = require('json5');
+const client = require('prom-client');
 
 console.log('GEMINI KEY LOADED:', !!process.env.GEMINI_API_KEY);
+
+const aiGenerationLatency = new client.Histogram({
+    name: 'ai_course_generation_duration_seconds',
+    help: 'Latency of Gemini AI generation in seconds',
+    labelNames: ['operation_type'], 
+    buckets: [1, 5, 10, 20, 30, 45, 60, 90, 120, 180, 300]
+});
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-3-flash-preview",
     generationConfig: {
         responseMimeType: "application/json",
         maxOutputTokens: 8192,
+        
     }
-
 });
 
 function cleanAIResponse(text) {
     let cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-
-    const firstBrace = cleaned.indexOf('{');
-    const lastBrace = cleaned.lastIndexOf('}');
-
-    if (firstBrace !== -1 && lastBrace !== -1) {
-        cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+    if (cleaned.startsWith('[')) {
+        const firstBracket = cleaned.indexOf('[');
+        const lastBracket = cleaned.lastIndexOf(']');
+        if (firstBracket !== -1 && lastBracket !== -1) {
+            cleaned = cleaned.substring(firstBracket, lastBracket + 1);
+        }
+    } else {
+        const firstBrace = cleaned.indexOf('{');
+        const lastBrace = cleaned.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+            cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+        }
     }
-
     return cleaned;
 }
 
-async function retryOperation(operation, maxRetries = 2) {
+async function retryOperation(operation, maxRetries = 3) {
     for (let i = 0; i < maxRetries; i++) {
         try {
             return await operation();
@@ -41,6 +54,8 @@ async function retryOperation(operation, maxRetries = 2) {
 
 async function generateCoursePlan(title, topicRequest) {
     console.log('GENERATE PLAN:', { title, topicRequest });
+    
+    const endTimer = aiGenerationLatency.startTimer({ operation_type: 'plan' });
 
     const prompt = `
         TASK: Generate a logical learning path for the course "${title}".
@@ -58,13 +73,17 @@ async function generateCoursePlan(title, topicRequest) {
     `;
 
     try {
-        return await retryOperation(async () => {
-            const result = await model.generateContent(prompt);
-            const text = cleanAIResponse(result.response.text());
+        const result = await retryOperation(async () => {
+            const res = await model.generateContent(prompt);
+            const text = cleanAIResponse(res.response.text());
             return JSON.parse(text);
         });
+        
+        endTimer(); 
+        return result;
+        
     } catch (error) {
-
+        endTimer(); 
         console.error("AI Plan Generation Error:", error);
         return [
             `Introduction to ${title}`,
@@ -76,6 +95,9 @@ async function generateCoursePlan(title, topicRequest) {
 }
 
 async function generateChapterData(courseTitle, chapterTitle) {
+    const endTimer = aiGenerationLatency.startTimer({ operation_type: 'chapter' });
+    console.time("Check-Latency");
+
     const prompt = `
         ACT as an expert professor for "${courseTitle}".
         TASK: Create a lecture and quiz for: "${chapterTitle}".
@@ -103,21 +125,25 @@ async function generateChapterData(courseTitle, chapterTitle) {
     `;
 
     try {
-        const result = await model.generateContent(prompt);
-        const text = cleanAIResponse(result.response.text());
+        const result = await retryOperation(async () => {
+            const res = await model.generateContent(prompt);
+            const text = cleanAIResponse(res.response.text());
 
-        try {
-            return JSON5.parse(text);
-        } catch (parseError) {
-            console.error("JSON Parse Failed. Bad text:", text);
-            throw parseError;
-        }
+            try {
+                return JSON5.parse(text);
+            } catch (parseError) {
+                console.error("JSON Parse Failed on this attempt. Text was:", text);
+                throw parseError; 
+            }
+        }, 3);
+        return result;
+        
     } catch (error) {
-        console.error("AI Chapter Generation Error:", error);
-        return {
-            content: `# Error Generating Content\n\nSorry, the AI could not generate this chapter right now. Please try again later.\n\n**Error details:** ${error.message}`,
-            quiz: []
-        };
+        console.error("Generation failed:", error.message);
+        return { content: "Error", quiz: [] };
+    } finally {
+        endTimer();
+        console.timeEnd("Check-Latency");
     }
 }
 

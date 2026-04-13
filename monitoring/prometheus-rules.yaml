@@ -1,14 +1,27 @@
 groups:
-  - name: registration_alerts
-    interval: 30s
+  - name: EduPlanAlerts
     rules:
-      - alert: TooManyRegistrationFailures
-        expr: rate(registrations_total{result="failure"}[1m]) > 0.05
-        for: 3m
+      - alert: ServerHealthStatus
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
         annotations:
-          summary: "Too many registration failures detected"
-          description: "Registration failure rate is {{ $value }} errors/sec (threshold: 0.05 errors/sec = 3 failures/min)"
+          summary: "EduAI IS UNAVAILABLE!!!"
+          description: " Server stopped working"
+
+      - alert: RegistrationHighErrorRate
+        expr: |
+          (
+            sum(increase(http_request_duration_seconds_count{route="/auth/users", status_code=~"5.."}[5m]))
+            / 
+            sum(increase(http_request_duration_seconds_count{route="/auth/users"}[5m]))
+          ) * 100 > 0.1
+        for: 2m
         labels:
           severity: warning
-
-
+          team: backend
+        annotations:
+          summary: "CRITICAL: Registration failure rate is too high"
+          description: "Over the last 5 minutes, {{ $value | printf \"%.2f\" }}% of registrations failed with 5xx errors. Check backend logs in Loki for route /auth/users."
