@@ -1,2 +1,6 @@
-.mongodb_data
-.backend.env
+
+backend/.env
+
+mongodb_data/
+
+**/.env
